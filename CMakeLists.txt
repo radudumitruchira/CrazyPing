@@ -4,7 +4,7 @@ project(CrazyPing)
 
 include(cmake/UpdateSubmodules.cmake)
 
-# add_subdirectory(vendor/SDL2)
+add_subdirectory(vendor/raylib)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -22,5 +22,5 @@ else ()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 endif ()
 
-# target_link_libraries(CrazyPing)
-# target_include_directories(CrazyPing PRIVATE vendor/SDL2/include)
+target_link_libraries(CrazyPing raylib)
+target_include_directories(CrazyPing PRIVATE vendor/raylib/src)
