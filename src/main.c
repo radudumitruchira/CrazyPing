@@ -2,14 +2,10 @@
 #include <math.h>
 #include <raylib.h>
 
-global Texture2D background1;
-global Texture2D background2;
-// global Texture2D background3;
+global Texture2D bgs[9] = {0};
+global Rectangle bgs_rect[9] = {0};
 
-global Rectangle bg1_rect;
-global Rectangle bg2_rect;
-
-global const u32 window_width = 1024;
+global const u32 window_width = 1720;
 global const u32 window_height = 800;
 
 function void
@@ -17,17 +13,13 @@ Render() {
 
     BeginDrawing();
     {
+
         ClearBackground((Color){0});
 
-        DrawTexturePro(background1, bg1_rect,
-                       (Rectangle){.x = 0, .y = 0, .width = (f32)window_width, .height = (f32)window_height},
-                       (Vector2){0, 0}, 0, WHITE);
-        DrawTexturePro(background2, bg2_rect,
-                       (Rectangle){.x = 0, .y = 0, .width = (f32)window_width, .height = (f32)window_height},
-                       (Vector2){0, 0}, 0, WHITE);
-
-        SetTextureWrap(background1, TEXTURE_WRAP_REPEAT);
-        SetTextureWrap(background2, TEXTURE_WRAP_REPEAT);
+        const Rectangle window_rect = {0, 0, (f32)window_width, (f32)window_height};
+        for (u64 i = 0; i < 9; i++) {
+            DrawTexturePro(bgs[i], bgs_rect[i], window_rect, (Vector2){0}, 0.0f, WHITE);
+        }
 
         DrawFPS(0, 0);
     }
@@ -42,14 +34,13 @@ HandleInput() {
 function void
 Update() {
     f32 delta_time = GetFrameTime();
+    for (u64 i = 1; i < 9; i++) {
+        bgs_rect[i].x += 10.0f * (i + 1) * delta_time;
 
-    bg1_rect.x += 50.f * delta_time;
-    if (bg1_rect.x >= bg1_rect.width)
-        bg1_rect.x = 0;
-
-    bg2_rect.x += 50.f * delta_time;
-    if (bg2_rect.x >= bg2_rect.width)
-        bg2_rect.x = 0;
+        if (bgs_rect[i].x >= bgs_rect[i].width)
+            bgs_rect[i].x = 0.0f;
+    }
+    bgs_rect[0].x += 100 * delta_time;
 }
 
 function void
@@ -59,26 +50,23 @@ InitSystems() {
     InitWindow(window_width, window_height, "CrazyPing");
     SetTargetFPS(currentFps);
 
-    background1 = LoadTexture("../../assets/platformer/background1.png");
-    background2 = LoadTexture("../../assets/platformer/background2.png");
-
-    bg1_rect.x = 0;
-    bg1_rect.y = 0;
-    bg1_rect.width = (f32)background1.width;
-    bg1_rect.height = (f32)background1.height;
-    bg1_rect.x = 0;
-
-    bg2_rect.x = 0;
-    bg2_rect.y = 0;
-    bg2_rect.width = (f32)background2.width;
-    bg2_rect.height = (f32)background2.height;
+    for (u64 i = 0; i < 9; i++) {
+        const char *path = TextFormat("../../assets/bg/layer%d.png", i);
+        bgs[i] = LoadTexture(path);
+        bgs_rect[i].x = 0;
+        bgs_rect[i].y = 0;
+        bgs_rect[i].width = (f32)bgs[i].width;
+        bgs_rect[i].height = (f32)bgs[i].height;
+        SetTextureWrap(bgs[i], TEXTURE_WRAP_REPEAT);
+    }
 }
 
 function void
 Cleanup() {
-    UnloadTexture(background2);
-    UnloadTexture(background1);
     CloseWindow();
+    for (u64 i = 0; i < 9; i++) {
+        UnloadTexture(bgs[i]);
+    }
 }
 
 function bool
